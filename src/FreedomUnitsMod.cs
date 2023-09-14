@@ -46,7 +46,7 @@ public class FreedomUnitsMod : ModSystem {
             };
 
             try {
-                return $"{float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture) * 9F / 5F + 32:0}°F";
+                return $"{float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture) * 9F / 5F + (delta ? 0 : 32):0.#}°F";
             }
             catch (FormatException) {
                 return match.Value;
