@@ -2,7 +2,7 @@
   "type": "code",
   "name": "Freedom Units",
   "modid": "freedomunits",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Changes all temperatures into fahrenheit",
   "website": "https://github.com/BillyGalbreath/VS-FreedomUnits",
   "authors": [ "BillyGalbreath" ],
