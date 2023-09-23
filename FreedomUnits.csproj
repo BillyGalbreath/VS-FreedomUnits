@@ -19,6 +19,10 @@
             <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="VSSurvivalMod">
+            <HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="CairoSharp">
             <HintPath>$(VINTAGE_STORY)/Lib/cairo-sharp.dll</HintPath>
             <Private>false</Private>

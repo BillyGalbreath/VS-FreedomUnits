@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using Cairo;
 using HarmonyLib;
@@ -8,6 +11,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Util;
+using Vintagestory.GameContent;
 
 namespace FreedomUnits;
 
@@ -52,5 +56,19 @@ public class FreedomUnitsMod : ModSystem {
                 return match.Value;
             }
         });
+    }
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(GuiDialogBlockEntityFirepit), "SetupDialog")]
+    public static IEnumerable<CodeInstruction> TranspileSetupDialog(IEnumerable<CodeInstruction> instructions) {
+        var codes = new List<CodeInstruction>(instructions);
+
+        for (int i = 0; i < codes.Count; i++) {
+            if (codes[i].opcode == OpCodes.Ldc_R8 && (codes[i].operand?.ToString()?.Equals("60") ?? false)) {
+                codes[i] = new CodeInstruction(OpCodes.Ldc_R8, 90.0);
+            }
+        }
+
+        return codes.AsEnumerable();
     }
 }
