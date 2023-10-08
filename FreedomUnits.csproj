@@ -41,7 +41,6 @@
         </None>
     </ItemGroup>
 
-
     <Target Name="CreateModsDirectory" AfterTargets="PostBuildEvent">
         <MakeDir Directories="bin/Mods"/>
     </Target>

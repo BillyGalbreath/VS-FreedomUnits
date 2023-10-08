@@ -46,6 +46,7 @@ public class FreedomUnitsMod : ModSystem {
             bool delta = original.Trim() switch {
                 { } s when s.StartsWithFast("+") => true,
                 { } s when s.StartsWithFast(Lang.Get("clothing-maxwarmth", "0.0").Split("0.0")[0]) => true,
+                { } s when s.Contains(Lang.Get("xskills:abilitydesc-heatinghits", "0.0").Split("0.0")[0]) => true,
                 _ => false
             };
 
