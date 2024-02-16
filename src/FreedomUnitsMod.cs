@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -17,13 +18,15 @@ using Vintagestory.GameContent;
 namespace FreedomUnits;
 
 [HarmonyPatch]
-public class FreedomUnitsMod : ModSystem {
-    private static readonly Regex TEMPERATURE_REGEX = new(@"(-?\d+(?:\.|,)?\d*)( ?)(°C|deg)");
+[SuppressMessage("ReSharper", "UnusedType.Global")]
+public partial class FreedomUnitsMod : ModSystem {
+    [GeneratedRegex("(-?\\d+(?:\\.|,)?\\d*)( ?)(°C|deg)")]
+    private static partial Regex TemperatureRegex();
 
     private static GuiDialog? _hudDebugScreen;
     private static ICoreAPI? _api;
 
-    private Harmony? harmony;
+    private Harmony? _harmony;
 
     public override bool ShouldLoad(EnumAppSide side) {
         return side.IsClient();
@@ -32,8 +35,8 @@ public class FreedomUnitsMod : ModSystem {
     public override void StartClientSide(ICoreClientAPI api) {
         _api = api;
 
-        harmony = new Harmony(Mod.Info.ModID);
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
+        _harmony = new Harmony(Mod.Info.ModID);
+        _harmony.PatchAll(Assembly.GetExecutingAssembly());
     }
 
     private static bool IsDebugHugText(string text) {
@@ -41,7 +44,7 @@ public class FreedomUnitsMod : ModSystem {
     }
 
     public override void Dispose() {
-        harmony?.UnpatchAll(Mod.Info.ModID);
+        _harmony?.UnpatchAll(Mod.Info.ModID);
 
         _hudDebugScreen = null;
         _api = null;
@@ -49,9 +52,10 @@ public class FreedomUnitsMod : ModSystem {
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TextDrawUtil), "Lineize", typeof(Context), typeof(string), typeof(EnumLinebreakBehavior), typeof(TextFlowPath[]), typeof(double), typeof(double), typeof(double), typeof(bool))]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static void PreLineize(ref string text) {
         string original = text;
-        text = TEMPERATURE_REGEX.Replace(text, match => {
+        text = TemperatureRegex().Replace(text, match => {
             if (match.Groups[3].Value.Normalize() is not ("°C" or "deg") || IsDebugHugText(original)) {
                 return match.Value;
             }
@@ -65,8 +69,7 @@ public class FreedomUnitsMod : ModSystem {
 
             try {
                 return $"{float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture) * 9F / 5F + (delta ? 0 : 32):0.#}°F";
-            }
-            catch (FormatException) {
+            } catch (FormatException) {
                 return match.Value;
             }
         });
@@ -74,8 +77,9 @@ public class FreedomUnitsMod : ModSystem {
 
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(GuiDialogBlockEntityFirepit), "SetupDialog")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static IEnumerable<CodeInstruction> TranspileSetupDialog(IEnumerable<CodeInstruction> instructions) {
-        var codes = new List<CodeInstruction>(instructions);
+        List<CodeInstruction> codes = new(instructions);
 
         for (int i = 0; i < codes.Count; i++) {
             if (codes[i].opcode == OpCodes.Ldc_R8 && (codes[i].operand?.ToString()?.Equals("60") ?? false)) {
