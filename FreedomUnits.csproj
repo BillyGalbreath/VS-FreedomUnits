@@ -2,21 +2,41 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <EmbedAllSources>true</EmbedAllSources>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <DebugType>embedded</DebugType>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DebugType>embedded</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
     </PropertyGroup>
 
     <ItemGroup>
+        <Reference Include="Vintagestory">
+            <HintPath>$(VINTAGE_STORY)/Vintagestory.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
         <Reference Include="VintagestoryAPI">
             <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VintagestoryLib">
+            <HintPath>$(VINTAGE_STORY)/VintagestoryLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VintagestoryServer">
+            <HintPath>$(VINTAGE_STORY)/VintagestoryServer.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VSCreative">
+            <HintPath>$(VINTAGE_STORY)/Mods/VSCreativeMod.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VSEssentials">
+            <HintPath>$(VINTAGE_STORY)/Mods/VSEssentials.dll</HintPath>
             <Private>false</Private>
         </Reference>
         <Reference Include="VSSurvivalMod">
@@ -31,21 +51,25 @@
             <HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="Newtonsoft.Json">
+            <HintPath>$(VINTAGE_STORY)/Lib/Newtonsoft.Json.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="protobuf-net">
+            <HintPath>$(VINTAGE_STORY)/Lib/protobuf-net.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
         <None Include="LICENSE" CopyToOutputDirectory="PreserveNewest"/>
-        <None Include="resources/**">
+        <None Include="resources/**" CopyToOutputDirectory="PreserveNewest">
             <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
-    <Target Name="CreateModsDirectory" AfterTargets="PostBuildEvent">
+    <Target Name="Package" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
         <MakeDir Directories="bin/Mods"/>
-    </Target>
-
-    <Target Name="Package" AfterTargets="CreateModsDirectory" Condition="'$(Configuration)' == 'Release'">
         <ZipDirectory DestinationFile="bin/Mods/$(TargetName).zip" SourceDirectory="$(TargetDir)" Overwrite="true"/>
     </Target>
 

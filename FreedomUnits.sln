@@ -4,12 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreedomUnits", "FreedomUnit
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C612BA5C-A5AC-4ABE-9AB8-54F725842D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C612BA5C-A5AC-4ABE-9AB8-54F725842D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C612BA5C-A5AC-4ABE-9AB8-54F725842D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C612BA5C-A5AC-4ABE-9AB8-54F725842D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
