@@ -11,6 +11,7 @@ using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Util;
+using Vintagestory.Client.NoObf;
 using Vintagestory.GameContent;
 
 namespace FreedomUnits;
@@ -19,6 +20,9 @@ namespace FreedomUnits;
 public class FreedomUnitsMod : ModSystem {
     private static readonly Regex TEMPERATURE_REGEX = new(@"(-?\d+(?:\.|,)?\d*)( ?)(°C|deg)");
 
+    private static GuiDialog? _hudDebugScreen;
+    private static ICoreAPI? _api;
+
     private Harmony? harmony;
 
     public override bool ShouldLoad(EnumAppSide side) {
@@ -26,12 +30,21 @@ public class FreedomUnitsMod : ModSystem {
     }
 
     public override void StartClientSide(ICoreClientAPI api) {
+        _api = api;
+
         harmony = new Harmony(Mod.Info.ModID);
         harmony.PatchAll(Assembly.GetExecutingAssembly());
     }
 
+    private static bool IsDebugHugText(string text) {
+        return ((_hudDebugScreen ??= ((ClientMain)_api?.World!).GetField<List<GuiDialog>>("LoadedGuis")!.FirstOrDefault(dlg => dlg is HudDebugScreen))?.IsOpened() ?? false) && text.Contains("Yaw: ") && text.Contains("Facing: ");
+    }
+
     public override void Dispose() {
         harmony?.UnpatchAll(Mod.Info.ModID);
+
+        _hudDebugScreen = null;
+        _api = null;
     }
 
     [HarmonyPrefix]
@@ -39,7 +52,7 @@ public class FreedomUnitsMod : ModSystem {
     public static void PreLineize(ref string text) {
         string original = text;
         text = TEMPERATURE_REGEX.Replace(text, match => {
-            if (match.Groups[3].Value.Normalize() is not ("°C" or "deg")) {
+            if (match.Groups[3].Value.Normalize() is not ("°C" or "deg") || IsDebugHugText(original)) {
                 return match.Value;
             }
 
@@ -71,5 +84,13 @@ public class FreedomUnitsMod : ModSystem {
         }
 
         return codes.AsEnumerable();
+    }
+}
+
+public static class Extensions {
+    private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+    public static T? GetField<T>(this object obj, string name) {
+        return (T?)obj.GetType().GetField(name, Flags)?.GetValue(obj);
     }
 }
