@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
@@ -92,9 +89,9 @@ public partial class FreedomUnitsMod : ModSystem {
 }
 
 public static class Extensions {
-    private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+    private const BindingFlags _flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
     public static T? GetField<T>(this object obj, string name) {
-        return (T?)obj.GetType().GetField(name, Flags)?.GetValue(obj);
+        return (T?)obj.GetType().GetField(name, _flags)?.GetValue(obj);
     }
 }
