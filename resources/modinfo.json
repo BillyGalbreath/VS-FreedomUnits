@@ -6,7 +6,7 @@
   "description": "Changes all temperatures into fahrenheit",
   "website": "https://github.com/BillyGalbreath/VS-FreedomUnits",
   "authors": [ "BillyGalbreath" ],
-  "side": "Client",
+  "requiredOnServer": false,
   "dependencies": {
     "game": "1.18.8"
   }
