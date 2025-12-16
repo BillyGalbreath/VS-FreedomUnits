@@ -37,7 +37,8 @@ public partial class FreedomUnitsMod : ModSystem {
     }
 
     private static bool IsDebugHugText(string text) {
-        return ((_hudDebugScreen ??= ((ClientMain)_api?.World!).GetField<List<GuiDialog>>("LoadedGuis")!.FirstOrDefault(dlg => dlg is HudDebugScreen))?.IsOpened() ?? false) && text.Contains("Yaw: ") && text.Contains("Facing: ");
+        _hudDebugScreen ??= ((ClientMain)_api?.World!).GetField<List<GuiDialog>>("LoadedGuis")!.FirstOrDefault(dlg => dlg is HudDebugScreen);
+        return (_hudDebugScreen?.IsOpened() ?? false) && text.Contains("Yaw: ") && text.Contains("Facing: ");
     }
 
     public override void Dispose() {
@@ -64,8 +65,10 @@ public partial class FreedomUnitsMod : ModSystem {
                 _ => false
             };
 
+            float temp = float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture);
+
             try {
-                return $"{float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture) * 9F / 5F + (delta ? 0 : 32):0.#}°F";
+                return $"{temp * 9F / 5F + (delta ? 0 : 32):0.#}°F";
             } catch (FormatException) {
                 return match.Value;
             }
