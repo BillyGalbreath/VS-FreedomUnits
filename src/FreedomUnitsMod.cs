@@ -17,7 +17,7 @@ namespace FreedomUnits;
 [HarmonyPatch]
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public partial class FreedomUnitsMod : ModSystem {
-    [GeneratedRegex("(-?\\d+(?:\\.|,)?\\d*)( ?)(°C|degree|deg)")]
+    [GeneratedRegex("([+-]?\\d+(?:[.,])?\\d*)( ?)(°C|degree|deg)")]
     private static partial Regex TemperatureRegex();
 
     private static GuiDialog? _hudDebugScreen;
@@ -58,8 +58,7 @@ public partial class FreedomUnitsMod : ModSystem {
                 return match.Value;
             }
 
-            bool delta = original.Trim() switch {
-                { } s when s.StartsWithFast("+") => true,
+            bool delta = match.Value.Normalize().StartsWithFast("+") || original.Normalize() switch {
                 { } s when s.StartsWithFast(Lang.Get("clothing-maxwarmth", "0.0").Split("0.0")[0]) => true,
                 { } s when s.Contains(Lang.Get("xskills:abilitydesc-heatinghits", "0.0").Split("0.0")[0]) => true,
                 _ => false
@@ -68,7 +67,7 @@ public partial class FreedomUnitsMod : ModSystem {
             float temp = float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture);
 
             try {
-                return $"{temp * 9F / 5F + (delta ? 0 : 32):0.#}°F";
+                return $"{(delta ? "+" : "")}{temp * 9F / 5F + (delta ? 0 : 32):0.#}°F";
             } catch (FormatException) {
                 return match.Value;
             }
