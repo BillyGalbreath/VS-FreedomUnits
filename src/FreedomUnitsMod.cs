@@ -58,7 +58,9 @@ public partial class FreedomUnitsMod : ModSystem {
                 return match.Value;
             }
 
-            bool delta = match.Value.Normalize().StartsWithFast("+") || original.Normalize() switch {
+            bool prefixed = match.Value.Normalize().StartsWithFast("+");
+
+            bool delta = prefixed || original.Normalize() switch {
                 { } s when s.StartsWithFast(Lang.Get("clothing-maxwarmth", "0.0").Split("0.0")[0]) => true,
                 { } s when s.Contains(Lang.Get("xskills:abilitydesc-heatinghits", "0.0").Split("0.0")[0]) => true,
                 _ => false
@@ -67,7 +69,7 @@ public partial class FreedomUnitsMod : ModSystem {
             float temp = float.Parse(match.Groups[1].Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture);
 
             try {
-                return $"{(delta ? "+" : "")}{temp * 9F / 5F + (delta ? 0 : 32):0.#}°F";
+                return $"{(prefixed ? "+" : "")}{temp * 9F / 5F + (delta ? 0 : 32):0.#}°F";
             } catch (FormatException) {
                 return match.Value;
             }
