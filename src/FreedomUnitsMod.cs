@@ -54,13 +54,13 @@ public partial class FreedomUnitsMod : ModSystem {
     public static void PreLineize(ref string text) {
         string original = text;
         text = TemperatureRegex().Replace(text, match => {
-            if (match.Groups[3].Value.Normalize() is not ("°C" or "degree" or "deg") || IsDebugHugText(original)) {
+            if (match.Groups[3].Value.Trim() is not ("°C" or "degree" or "deg") || IsDebugHugText(original)) {
                 return match.Value;
             }
 
-            bool prefixed = match.Value.Normalize().StartsWithFast("+");
+            bool prefixed = match.Value.Trim().StartsWithFast("+");
 
-            bool delta = prefixed || original.Normalize() switch {
+            bool delta = prefixed || original.Trim() switch {
                 { } s when s.StartsWithFast(Lang.Get("clothing-maxwarmth", "0.0").Split("0.0")[0]) => true,
                 { } s when s.Contains(Lang.Get("xskills:abilitydesc-heatinghits", "0.0").Split("0.0")[0]) => true,
                 _ => false
