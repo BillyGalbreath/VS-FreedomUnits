@@ -1,31 +1,52 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <EmbedAllSources>true</EmbedAllSources>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0</TargetFramework>
+        <Version>1.1.4</Version>
+        <Description>Changes all temperatures into Fahrenheit</Description>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
         <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="VintagestoryAPI" HintPath="$(VINTAGE_STORY)/VintagestoryAPI.dll" Private="false" />
-        <Reference Include="VintagestoryLib" HintPath="$(VINTAGE_STORY)/VintagestoryLib.dll" Private="false" />
-        <Reference Include="VSSurvivalMod" HintPath="$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll" Private="false" />
-        <Reference Include="CairoSharp" HintPath="$(VINTAGE_STORY)/Lib/cairo-sharp.dll" Private="false" />
-        <Reference Include="0Harmony" HintPath="$(VINTAGE_STORY)/Lib/0Harmony.dll" Private="false" />
-        <None Include="LICENSE;README.md;resources/**" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <Reference Include="$(VINTAGE_STORY)/**/*.dll" Exclude="$(VINTAGE_STORY)/**/CairoSharp.dll" Private="false"/>
+        <None Include="LICENSE;README.md;resources/**" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath=""/>
     </ItemGroup>
 
-    <Target Name="Package" AfterTargets="PostBuildEvent">
-        <ZipDirectory DestinationFile="bin/$(TargetName).zip" SourceDirectory="$(TargetDir)" Overwrite="true" />
+    <Target Name="ExtraClean" AfterTargets="Clean">
+        <RemoveDir Directories="bin/$(Configuration)"/>
+        <RemoveDir Directories="web/dist"/>
+    </Target>
+
+    <Target Name="ProcessResources" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <ResourceFiles Include="resources/modinfo.json">
+                <Destination>$(TargetDir)/modinfo.json</Destination>
+            </ResourceFiles>
+        </ItemGroup>
+        <WriteLinesToFile Lines="$([System.IO.File]::ReadAllText(%(ResourceFiles.Identity))
+                .Replace('{version}','$(Version)')
+                .Replace('{description}','$(Description)')
+            )" File="%(ResourceFiles.Destination)" WriteOnlyWhenDifferent="false" Overwrite="true" Encoding="UTF-8"
+        />
+    </Target>
+
+    <Target Name="Package" AfterTargets="ProcessResources">
+        <ItemGroup>
+            <FilesToDelete Include="$(TargetDir)/*.deps.json"/>
+        </ItemGroup>
+        <Delete Files="@(FilesToDelete)"/>
+        <ZipDirectory DestinationFile="bin/$(TargetName)-$(Version).zip" SourceDirectory="$(TargetDir)" Overwrite="true"/>
     </Target>
 
 </Project>
