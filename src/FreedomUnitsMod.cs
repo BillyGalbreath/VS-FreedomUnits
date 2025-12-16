@@ -17,7 +17,7 @@ namespace FreedomUnits;
 [HarmonyPatch]
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public partial class FreedomUnitsMod : ModSystem {
-    [GeneratedRegex("(-?\\d+(?:\\.|,)?\\d*)( ?)(°C|deg)")]
+    [GeneratedRegex("(-?\\d+(?:\\.|,)?\\d*)( ?)(°C|degree|deg)")]
     private static partial Regex TemperatureRegex();
 
     private static GuiDialog? _hudDebugScreen;
@@ -54,7 +54,7 @@ public partial class FreedomUnitsMod : ModSystem {
     public static void PreLineize(ref string text) {
         string original = text;
         text = TemperatureRegex().Replace(text, match => {
-            if (match.Groups[3].Value.Normalize() is not ("°C" or "deg") || IsDebugHugText(original)) {
+            if (match.Groups[3].Value.Normalize() is not ("°C" or "degree" or "deg") || IsDebugHugText(original)) {
                 return match.Value;
             }
 
